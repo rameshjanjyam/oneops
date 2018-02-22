@@ -1,3 +1,7 @@
+Dir[::File.expand_path('../../files/default/vendor/bundle/ruby/gems/**/lib', __FILE__)].each do |libdir|
+  $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
+end
+
 class Chef
   module Artifact
     DATA_BAG = "artifact".freeze
@@ -119,6 +123,7 @@ class Chef
       # information about that file. See NexusCli::ArtifactActions#pull_artifact.
       def retrieve_from_nexus(node, source, destination_dir, options = {})
         require 'nexus_cli'
+
         config = data_bag_config_for(node, DATA_BAG_NEXUS)
         if config.empty?
           raise DataBagNotFound.new(DATA_BAG_NEXUS)

@@ -22,6 +22,9 @@
 require 'digest'
 require 'pathname'
 require 'yaml'
+Dir[::File.expand_path('../../files/default/vendor/bundle/ruby/gems/**/lib', __FILE__)].each do |libdir|
+  $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
+end
 
 attr_reader :release_path
 attr_reader :current_path
@@ -58,14 +61,6 @@ def load_current_resource
     Chef::Application.fatal!(msg)
   end
 
-  chef_gem "i18n" do
-    version "0.6.9"
-  end
-
-  chef_gem "activesupport" do
-    version "3.2.11"
-  end
-
   if @new_resource.version =~ /\s/
     Chef::Log.warn "Whitespaces detected in resource version. Current Element value is:"+@new_resource.version
     @new_resource.version.gsub!(/\s/, "")
@@ -79,10 +74,6 @@ def load_current_resource
   end
 
   if Chef::Artifact.from_nexus?(@new_resource.artifact_location)
-    chef_gem "nexus_cli" do
-      version "3.0.0"
-    end
-
     group_id, artifact_id, extension, classifier = @new_resource.artifact_location.split(':')
     @artifact_version  = Chef::Artifact.get_actual_version(node, [group_id, artifact_id, @new_resource.version, extension].join(':'), @new_resource.ssl_verify)
     @artifact_location = [group_id, artifact_id, artifact_version, extension, classifier].join(':')

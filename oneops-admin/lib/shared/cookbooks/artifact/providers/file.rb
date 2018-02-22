@@ -18,14 +18,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+Dir[::File.expand_path('../../files/default/vendor/bundle/ruby/gems/**/lib', __FILE__)].each do |libdir|
+  $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
+end
+
 attr_reader :file_location
 
 def load_current_resource
   if Chef::Artifact.from_nexus?(new_resource.location)
-    chef_gem "nexus_cli" do
-      version "3.0.0"
-    end
-
     @file_location = Chef::Artifact.artifact_download_url_for(node, new_resource.location)
     Chef::Log.info "[artifact_file] Downloading artifact file from url: #{@file_location}"
   else
